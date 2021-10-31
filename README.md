@@ -43,3 +43,4 @@ PUT - localhost:3000/categorie/:id
 DELETE - localhost:3000/categorie
 DELETE - localhost:3000/categorie/id
 ```
+# api-peliculas-pedidos
