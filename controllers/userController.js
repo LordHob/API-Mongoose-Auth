@@ -1,19 +1,19 @@
 const db = require("../models");
-const user = db.users;
+const User = db.users;
 // const { user } = require('../models/index');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const authConfig = require('../config/auth');
 
-const AuthController = {}; //Create the object controller
+const UserController = {}; //Create the object controller
 
 //-------------------------------------------------------------------------------------
 //Login user with database
 //get user
-AuthController.signIn = (req, res) =>{
+UserController.signIn = (req, res) =>{
         let { email, password } = req.body;
         // Buscar usuario
-        user.findOne({ where: { email: email }
+        User.findOne({ where: { email: email }
         }).then(user => {
             if (!user) {
                 res.status(404).json({ msg: "Usuario con este correo no encontrado" });
@@ -42,16 +42,17 @@ AuthController.signIn = (req, res) =>{
 //-------------------------------------------------------------------------------------
 //REGISTER new user in database
 //create user
-AuthController.signUp = (req, res)=> {
+UserController.signUp = (req, res)=> {
 
         // Encriptamos la contraseña
         let password = bcrypt.hashSync(req.body.password, Number.parseInt(authConfig.rounds));
 
         // Crear un usuario
-        user.create({
+        User.create({
             name: req.body.name,
             email: req.body.email,
-            password: password
+            password: password,
+            rol: req.body.rol
         }).then(user => {
 
             // Creamos el token
@@ -68,7 +69,45 @@ AuthController.signUp = (req, res)=> {
             res.status(500).json(err);
         });
 
-    };
+};
 
-module.exports = AuthController;
+UserController.findOne = (req, res) => {
+    const id = req.params.id;
+  
+    User.findById(id)
+      .then(data => {
+        if (!data) res.status(404).send({ message: "Not found Pedido with id " + id });
+        else res.send(data);
+      })
+      .catch(err => {
+        res
+          .status(500)
+          .send({ message: "Error retrieving Pedido with id=" + id });
+      });
+};
+
+UserController.delete = (req, res) => {
+    const id = req.params.id;
+  
+    User.findByIdAndRemove(id, { useFindAndModify: false })
+      .then(data => {
+        if (!data) {
+          res.status(404).send({
+            message: `Cannot delete Pedido with id=${id}. Maybe user was not found!`
+          });
+        } else {
+          res.send({
+            message: "User was deleted successfully!"
+          });
+        }
+      })
+      .catch(err => {
+        res.status(500).send({
+          message: "Could not delete Pedido with id=" + id
+        });
+      });
+  };
+  
+
+module.exports = UserController;
 

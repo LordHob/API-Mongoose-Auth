@@ -27,6 +27,8 @@ app.use(cors(corsOptions)); //Add CORS Middleware
 app.get('/', (req, res) => {res.send('Bienvenidos a Express');});
 app.use(router);
 
+//conectar con la DB
+
 db.mongoose
   .connect(db.url, {
     useNewUrlParser: true,
